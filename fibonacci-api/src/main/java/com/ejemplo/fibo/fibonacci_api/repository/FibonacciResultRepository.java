@@ -11,4 +11,4 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface FibonacciResultRepository extends JpaRepository<FibonacciResult, Long> {// Interfaz que extiende JpaRepository para la gestión de la entidad FibonacciResult
 }
-
+// Esta interfaz permite realizar operaciones CRUD (Crear, Leer, Actualizar, Eliminar) sobre la entidad FibonacciResult en la base de datos.

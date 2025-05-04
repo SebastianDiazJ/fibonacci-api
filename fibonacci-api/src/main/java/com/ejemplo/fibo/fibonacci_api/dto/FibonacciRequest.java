@@ -1,5 +1,5 @@
 package com.ejemplo.fibo.fibonacci_api.dto;
-
+//esta clase se encarga de recibir la solicitud de Fibonacci
 public class FibonacciRequest {// Clase DTO para recibir la solicitud de Fibonacci
     private long a;
     private long b;

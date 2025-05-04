@@ -2,7 +2,7 @@ package com.ejemplo.fibo.fibonacci_api.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
-
+//esta clase se encarga de guardar los resultados de Fibonacci
 @Entity
 public class FibonacciResult {
 
@@ -10,11 +10,14 @@ public class FibonacciResult {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private long a;
-    private long b;
-    private int cantidad;
+    // Cambiados de primitivos a objetos para permitir null si es necesario
+    private Long a;
+    private Long b;
+    private Integer cantidad;
+
     private String resultado;
     private String email;
+
     private LocalDateTime fechaEnvio;
 
     // Getters y Setters
@@ -23,27 +26,27 @@ public class FibonacciResult {
         return id;
     }
 
-    public long getA() {
+    public Long getA() {
         return a;
     }
 
-    public void setA(long a) {
+    public void setA(Long a) {
         this.a = a;
     }
 
-    public long getB() {
+    public Long getB() {
         return b;
     }
 
-    public void setB(long b) {
+    public void setB(Long b) {
         this.b = b;
     }
 
-    public int getCantidad() {
+    public Integer getCantidad() {
         return cantidad;
     }
 
-    public void setCantidad(int cantidad) {
+    public void setCantidad(Integer cantidad) {
         this.cantidad = cantidad;
     }
 

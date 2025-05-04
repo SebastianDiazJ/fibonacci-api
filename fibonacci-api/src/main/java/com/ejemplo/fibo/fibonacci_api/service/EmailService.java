@@ -15,7 +15,7 @@ public class EmailService {
     @Autowired
     private JavaMailSender javaMailSender;
 
-    public void enviarResultado(String destino, String resultado, LocalDateTime fecha) throws MessagingException {
+    public void enviarResultado(String destino, String resultado, LocalDateTime fecha) throws MessagingException {// Método para enviar el resultado de la secuencia Fibonacci por correo electrónico
         MimeMessage mensaje = javaMailSender.createMimeMessage();
         MimeMessageHelper helper = new MimeMessageHelper(mensaje, true);
 

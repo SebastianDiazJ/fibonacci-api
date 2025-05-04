@@ -17,13 +17,13 @@ public class FileUploadController {
     private FibonacciService fibonacciService;
 
     @PostMapping("/upload")
-    public ResponseEntity<String> handleFileUpload(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<String> handleFileUpload(@RequestParam("file") MultipartFile file) {//sirve para manejar la subida de archivos responseEntity<String> es una respuesta que contiene un cuerpo de tipo String
         try {
             // Leer contenido del archivo
             String content = new String(file.getBytes(), StandardCharsets.UTF_8);
             String[] parts = content.split(",");
 
-            long a = Long.parseLong(parts[0].trim());
+            long a = Long.parseLong(parts[0].trim());//se usa para convertir el primer elemento del archivo a un número largo
             long b = Long.parseLong(parts[1].trim());
             int cantidad = Integer.parseInt(parts[2].trim());
             String email = parts[3].trim();
@@ -32,7 +32,7 @@ public class FileUploadController {
             fibonacciService.procesarYGuardarYEnviar(a, b, cantidad, email);
 
             return ResponseEntity.ok("Archivo procesado correctamente");
-        } catch (Exception e) {
+        } catch (Exception e) {//se usa catch para manejar excepciones porque puede haber errores al procesar el archivo
             e.printStackTrace(); // para ayudarte a ver el error en consola
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Error al procesar el archivo.");
         }
