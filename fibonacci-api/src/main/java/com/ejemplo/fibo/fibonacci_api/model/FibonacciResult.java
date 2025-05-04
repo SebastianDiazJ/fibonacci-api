@@ -10,10 +10,12 @@ public class FibonacciResult {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String inputValues;
-    private String generatedSequence;
-    private String emailSentTo;
-    private LocalDateTime sentAt;
+    private long a;
+    private long b;
+    private int cantidad;
+    private String resultado;
+    private String email;
+    private LocalDateTime fechaEnvio;
 
     // Getters y Setters
 
@@ -21,39 +23,51 @@ public class FibonacciResult {
         return id;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public long getA() {
+        return a;
     }
 
-    public String getInputValues() {
-        return inputValues;
+    public void setA(long a) {
+        this.a = a;
     }
 
-    public void setInputValues(String inputValues) {
-        this.inputValues = inputValues;
+    public long getB() {
+        return b;
     }
 
-    public String getGeneratedSequence() {
-        return generatedSequence;
+    public void setB(long b) {
+        this.b = b;
     }
 
-    public void setGeneratedSequence(String generatedSequence) {
-        this.generatedSequence = generatedSequence;
+    public int getCantidad() {
+        return cantidad;
     }
 
-    public String getEmailSentTo() {
-        return emailSentTo;
+    public void setCantidad(int cantidad) {
+        this.cantidad = cantidad;
     }
 
-    public void setEmailSentTo(String emailSentTo) {
-        this.emailSentTo = emailSentTo;
+    public String getResultado() {
+        return resultado;
     }
 
-    public LocalDateTime getSentAt() {
-        return sentAt;
+    public void setResultado(String resultado) {
+        this.resultado = resultado;
     }
 
-    public void setSentAt(LocalDateTime sentAt) {
-        this.sentAt = sentAt;
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public LocalDateTime getFechaEnvio() {
+        return fechaEnvio;
+    }
+
+    public void setFechaEnvio(LocalDateTime fechaEnvio) {
+        this.fechaEnvio = fechaEnvio;
     }
 }
