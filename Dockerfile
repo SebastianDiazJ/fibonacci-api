@@ -1,13 +1,30 @@
-# Usa una imagen ligera de Java 17
-FROM eclipse-temurin:17-jdk-alpine
-
-# Directorio de la aplicación
+# Comando para arrancar
+ENTRYPOINT ["java","-jar","/app/app.jar"]
+# Etapa 1: compilar con Maven
+FROM maven:3.8.5-openjdk-17 AS build
 WORKDIR /app
 
-# Copia el JAR que genera Maven
-COPY target/fibonacci-api-0.0.1-SNAPSHOT.jar app.jar
-# Expone el puerto que usará Spring Boot
+# Copiamos pom.xml y el wrapper para acelerar la descarga de dependencias
+COPY pom.xml .
+COPY mvnw .
+COPY .mvn .mvn
+
+# Descargamos dependencias sin compilar aún
+RUN ./mvnw dependency:go-offline -B
+
+# Copiamos el código fuente y compilamos
+COPY src ./src
+RUN ./mvnw package -DskipTests -B
+
+# Etapa 2: runtime con Java
+FROM eclipse-temurin:17-jdk-alpine
+WORKDIR /app
+
+# Copiamos el JAR desde la etapa de build
+COPY --from=build /app/target/*.jar app.jar
+
+# Exponemos el puerto
 EXPOSE 8080
 
-# Comando para arrancar
+# Arrancamos la aplicación
 ENTRYPOINT ["java","-jar","/app/app.jar"]
