@@ -1,6 +1,5 @@
 package com.ejemplo.fibo.fibonacci_api.controller;
 
-import com.ejemplo.fibo.fibonacci_api.dto.HoraRequest;
 import com.ejemplo.fibo.fibonacci_api.model.FibonacciResult;
 import com.ejemplo.fibo.fibonacci_api.service.EmailService;
 import com.ejemplo.fibo.fibonacci_api.service.FibonacciService;
@@ -24,24 +23,36 @@ public class FibonacciHoraController {
     private EmailService emailService;
 
     @PostMapping("/hora")
-    public ResponseEntity<?> generarDesdeHora(@RequestBody HoraRequest request) {
+    public ResponseEntity<?> generarDesdeHoraActual() {
         try {
-            String horaStr = request.getHora(); // formato esperado HH:mm:ss
-            LocalTime hora = LocalTime.parse(horaStr);
+            // Obtener hora actual del sistema
+            LocalTime hora = LocalTime.now();
 
-            int semilla1 = hora.getMinute() % 10;
-            int semilla2 = hora.getSecond() % 10;
+            int minutos = hora.getMinute(); // ejemplo: 49
+            int segundos = hora.getSecond(); // ejemplo: 08
 
-            if (semilla2 <= 0) return ResponseEntity.badRequest().body("Los segundos no pueden ser cero.");
+            // Semillas: decena y unidad del minuto actual
+            int semilla1 = minutos / 10;  // decena de los minutos
+            int semilla2 = minutos % 10;  // unidad de los minutos
 
-            List<Integer> serie = fibonacciService.generarSerieDesdeHora(semilla1, semilla2);
-            FibonacciResult resultado = fibonacciService.guardarResultado(horaStr, serie);
+            // Validación
+            if (segundos <= 0) {
+                return ResponseEntity.badRequest().body("Los segundos no pueden ser cero.");
+            }
 
-            String mensaje = "Hola, esta es la serie generada a las " + horaStr +
+            // Generar serie completa (semillas + cantidad basada en segundos), y en orden descendente
+            List<Integer> serie = fibonacciService.generarSerieDescendente(semilla1, semilla2, segundos);
+
+            // Guardar resultado en DB
+            FibonacciResult resultado = fibonacciService.guardarResultado(hora.toString(), serie);
+
+            // Construir mensaje
+            String mensaje = "Hola, esta es la serie generada a las " + hora +
                     "\nSemillas: " + semilla1 + ", " + semilla2 +
                     "\nSerie: " + serie +
                     "\n\nGracias por usar nuestra API.";
 
+            // Enviar a ambos correos
             emailService.enviarEmail("sdiazj@proteccion.com.co", "Prueba Técnica Sebastián Diaz", mensaje);
             emailService.enviarEmail("sebasdj2006@gmail.com", "Prueba Técnica Sebastián Diaz", mensaje);
 
@@ -51,7 +62,9 @@ public class FibonacciHoraController {
             return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body("Error al enviar correo: " + e.getMessage());
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error procesando la hora: " + e.getMessage());
+                    .body("Error procesando la hora automática: " + e.getMessage());
         }
     }
+
 }
+

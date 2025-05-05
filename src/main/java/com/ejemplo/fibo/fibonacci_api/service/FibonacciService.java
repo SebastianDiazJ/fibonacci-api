@@ -20,61 +20,30 @@ public class FibonacciService {
     @Autowired
     private EmailService emailService;
 
-    /**
-     * Genera una secuencia Fibonacci desde dos números iniciales (a, b), guarda el resultado
-     * en base de datos, y lo envía por correo electrónico al destinatario indicado.
-     */
-    public void procesarYGuardarYEnviar(long a, long b, int cantidad, String email) throws MessagingException {
-        List<Long> secuencia = new ArrayList<>();
-        secuencia.add(a);
-        secuencia.add(b);
-
-        for (int i = 2; i < cantidad; i++) {
-            secuencia.add(secuencia.get(i - 1) + secuencia.get(i - 2));
-        }
-
-        String resultado = secuencia.toString();
-        LocalDateTime ahora = LocalDateTime.now();
-
-        FibonacciResult result = new FibonacciResult();
-        result.setA(a);
-        result.setB(b);
-        result.setCantidad(cantidad);
-        result.setResultado(resultado);
-        result.setFechaEnvio(ahora);
-        result.setEmail(email);
-
-        repository.save(result);
-        emailService.enviarEmail(email, resultado, String.valueOf(ahora));
-    }
-
-    // Generar una serie de Fibonacci con N elementos a partir de dos semillas
-    public List<Integer> generarSerieDesdeHora(int a, int b) {
+    public List<Integer> generarSerieDescendente(int a, int b, int cantidad) {
         List<Integer> serie = new ArrayList<>();
         serie.add(a);
         serie.add(b);
 
-        int cantidad = b; // N = segundos
-
-        for (int i = 2; i < cantidad; i++) {
-            serie.add(serie.get(i - 1) + serie.get(i - 2));
+        for (int i = 2; i < cantidad + 2; i++) { // +2 porque semilla1 y semilla2 ya se agregaron
+            int next = serie.get(i - 1) + serie.get(i - 2);
+            serie.add(next);
         }
-        return serie;
 
+        Collections.reverse(serie); // serie descendente
+        return serie;
     }
 
-    // Guardar resultado y retornar el objeto guardado
+
     public FibonacciResult guardarResultado(String horaStr, List<Integer> serie) {
         FibonacciResult result = new FibonacciResult();
-
-        result.setA((long) serie.get(0));
-        result.setB((long) serie.get(1));
-        result.setCantidad(serie.size());
+        result.setA((long) serie.get(serie.size() - 2)); // semilla1 original
+        result.setB((long) serie.get(serie.size() - 1)); // semilla2 original
+        result.setCantidad(serie.size() - 2); // solo los números extra
         result.setResultado(serie.toString());
         result.setFechaEnvio(LocalDateTime.now());
         result.setEmail("Sistema - desde hora: " + horaStr);
-
         return repository.save(result);
     }
-
 }
+
