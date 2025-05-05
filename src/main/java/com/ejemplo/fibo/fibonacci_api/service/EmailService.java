@@ -7,7 +7,7 @@ import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.util.regex.Pattern;
 
 @Service
 public class EmailService {
@@ -15,15 +15,27 @@ public class EmailService {
     @Autowired
     private JavaMailSender javaMailSender;
 
-    public void enviarResultado(String destino, String resultado, LocalDateTime fecha) throws MessagingException {// Método para enviar el resultado de la secuencia Fibonacci por correo electrónico
+    // Expresión regular para validar correos electrónicos simples
+    private static final Pattern EMAIL_PATTERN = Pattern.compile(
+            "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$"
+    );
+
+    public void enviarEmail(String destino, String asunto, String cuerpoTexto) throws MessagingException {
+        if (!esCorreoValido(destino)) {
+            throw new IllegalArgumentException("Correo inválido: " + destino);
+        }
+
         MimeMessage mensaje = javaMailSender.createMimeMessage();
-        MimeMessageHelper helper = new MimeMessageHelper(mensaje, true);
+        MimeMessageHelper helper = new MimeMessageHelper(mensaje, false, "UTF-8");
 
         helper.setTo(destino);
-        helper.setSubject("Resultado de la Secuencia Fibonacci");
-        helper.setText("Hola,\n\nAquí tienes el resultado:\n\n" + resultado +
-                "\n\nFecha de envío: " + fecha + "\n\nSaludos,\nTu API");
+        helper.setSubject(asunto);
+        helper.setText(cuerpoTexto, false);
 
         javaMailSender.send(mensaje);
+    }
+
+    private boolean esCorreoValido(String correo) {
+        return EMAIL_PATTERN.matcher(correo).matches();
     }
 }

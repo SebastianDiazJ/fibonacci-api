@@ -1,6 +1,7 @@
 package com.ejemplo.fibo.fibonacci_api.repository;
 
 
+
 import com.ejemplo.fibo.fibonacci_api.model.FibonacciResult;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
