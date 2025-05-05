@@ -1,158 +1,130 @@
-# Fibonacci API
+# 🧮 Fibonacci API (Versión basada en hora del sistema)
 
-## Descripción
+## 📌 Descripción
 
-La **Fibonacci API** es una aplicación desarrollada en **Java** utilizando el framework **Spring Boot**.
-Su propósito principal es procesar secuencias de números de Fibonacci,
-almacenarlas en una base de datos de postgrest y enviar los resultados por correo electrónico.
-La API permite a los usuarios cargar un archivo con los parámetros necesarios para generar la secuencia de Fibonacci
-y automatiza el procesamiento, almacenamiento y envío de los resultados.
+Esta API genera una secuencia descendente de Fibonacci **utilizando los minutos (X)** y **segundos (Y)** de una hora específica (formato `HH:mm:ss`) como semillas.
 
-## Funcionalidades
+👉 La API fue desarrollada con **Java 17** y **Spring Boot**, implementando buenas prácticas de arquitectura (MVC), pruebas automatizadas, autenticación básica, envío de correos electrónicos y despliegue en Render.
 
-1. **Carga de Archivos**:
-   - Los usuarios pueden cargar un archivo en formato de texto plano (`.txt`) que contiene los parámetros necesarios para generar la secuencia de Fibonacci.
-   - El archivo debe tener el siguiente formato:
-     ```
-     <número_inicial_1>,<número_inicial_2>,<cantidad_de_elementos>,<correo_electrónico>
-     ```
-     Ejemplo:
-     ```
-     0,1,10,usuario@ejemplo.com
-     ```
+---
 
-2. **Generación de Secuencia de Fibonacci**:
-   - A partir de los dos números iniciales y la cantidad de 
-   - elementos especificados, la API genera la secuencia de Fibonacci.
+## ⚙️ Funcionalidades
 
-3. **Almacenamiento en Base de Datos**:
-   - Los resultados generados se almacenan en una base de datos utilizando **Spring Data JPA**. Cada resultado incluye:
-     - Los números iniciales.
-     - La cantidad de elementos generados.
-     - La secuencia completa.
-     - La fecha de procesamiento.
-     - El correo electrónico del destinatario.
+✅ Genera secuencias de Fibonacci **descendentes**  
+✅ Toma la hora del sistema 
+✅ Guarda los resultados en una base de datos PostgreSQL  
+✅ Envía el resultado por **correo electrónico a dos destinatarios**  
+✅ Permite consultar el historial de resultados por endpoint autenticado  
+✅ Contiene pruebas unitarias y de integración  
+✅ Expuesta visualmente con endpoints en Swagger UI  
+✅ Desplegada en Render para uso público
 
-4. **Envío de Resultados por Correo Electrónico**:
-   - Una vez procesada la secuencia, la API envía un correo 
-   - electrónico al destinatario especificado con los resultados y la fecha de envío.
+---
 
-## Endpoints
+## 🕒 Lógica de generación
 
-### `POST /api/file/upload`
-- **Descripción**: Permite cargar un archivo con los parámetros para generar la secuencia de Fibonacci.
-- **Parámetros**:
-  - `file` (MultipartFile): Archivo que contiene los parámetros.
-- **Respuesta**:
-  - `200 OK`: Si el archivo se procesa correctamente.
-  - `400 BAD REQUEST`: Si ocurre un error al procesar el archivo.
-- **Ejemplo de Respuesta Exitosa**:
-  ```json
+Dada una hora en formato `HH:mm:ss`, se define:
+- `X = minutos`
+- `Y = segundos`
+- Números iniciales: `X` y `Y`
+- Se generan **Y elementos** a partir de esas semillas (no se cuentan las semillas)
+- La secuencia final es ordenada de forma **descendente**
+
+📌 Ejemplo:
+
+Hora: `13:21:08`
+
+- Semillas: `2,1`, `8`
+- Cantidad de elementos: `8`
+- Serie generada: `21, 8, 29, 37, 66, 103, 169, 272, 441, 713`
+- Serie descendente: `713, 441, 272, 169, 103, 66, 37, 29, 8, 21`
+
+---
+
+## 🔒 Seguridad
+
+La API expone un endpoint para consultar las series generadas que requiere autenticación básica (`Basic Auth`).
+
+### Autenticación básica
+spring.security.user.name=
+spring.security.user.password=
+
+📦 Endpoints
+🔹 POST https://fibonacci-api-y490.onrender.com/api/fibonacci/hora
+📩 Genera una secuencia de Fibonacci a partir de una hora actual.
+
+ GET /api/fibonacci/all
+📋 Retorna todas las secuencias generadas y almacenadas en la base de datos.
+
+Requiere autenticación básica.
+
+📤 Respuesta (ejemplo):
+
+
+[
   {
-    "message": "Archivo procesado correctamente"
+    "horaProcesamiento": "2025-05-05T13:21:08",
+    "semillas": "21,8",
+    "cantidad": 8,
+    "serie": "713,441,272,169,103,66,37,29,8,21",
+    "destinatarios": ["correo1@dominio.com", "correo2@dominio.com"]
   }
-  ```
-## Arquitectura
-             [Cliente HTTP] 
-                    ↓
-          ┌─────────────────────┐
-          │   Spring Boot App   │
-          │                     │
-          │ ┌─────────────────┐ │
-          │ │  FileUpload     │ │───📧─► SMTP Server
-          │ │  Controller     │ │
-          │ └─────────────────┘ │
-          │ ┌─────────────────┐ │
-          │ │  FibonacciService│
-          │ │  + EmailService  │
-          │ └─────────────────┘ │
-          │ ┌─────────────────┐ │
-          │ │  FibonacciResult │─► PostgreSQL
-          │ │  Repository      │
-          │ └─────────────────┘ │
-          │ ┌─────────────────┐ │
-          │ │ Static Resource │─► `/index.html`
-          │ │ (HTML + JS)     │
-          │ └─────────────────┘ │
-          └─────────────────────┘
-## Prerequisitos
-Java 17
+]
 
-Maven
+## 🧱 Arquitectura del Proyecto
+┌────────────────────────────┐
+│    Spring Boot Application │
+│                            │
+│ ┌────────────────────────┐ │
+│ │   FibonacciController  │◄───── Recepción de hora y retorno de resultados
+│ └────────────────────────┘ │
+│ ┌────────────────────────┐ │
+│ │   FibonacciService     │◄───── Lógica principal de generación
+│ └────────────────────────┘ │
+│ ┌────────────────────────┐ │
+│ │   EmailService         │◄───── Envío de resultados por correo
+│ └────────────────────────┘ │
+│ ┌────────────────────────┐ │
+│ │   FibonacciResult      │◄───── Entidad JPA (modelo)
+│ └────────────────────────┘ │
+│ ┌────────────────────────┐ │
+│ │   FibonacciRepository  │◄───── Acceso a base de datos (PostgreSQL)
+│ └────────────────────────┘ │
+└────────────────────────────┘
 
-Docker
+## 📂 Estructura del Proyect
+src/
+├── controller/
+│   └── FibonacciController.java
+├── model/
+│   └── FibonacciResult.java
+├── repository/
+│   └── FibonacciRepository.java
+├── service/
+│   ├── FibonacciService.java
+│   └── EmailService.java
+├── dto/
+│   └── HoraRequest.java
+└── test/
+├── FibonacciServiceTest.java
+└── FibonacciControllerTest.java
 
-Cuenta en Render (para despliegue)
+## 🧪 Pruebas
+Para ejecutar las pruebas:
 
-(Opcional) Postman o cURL
+mvn test
 
+✔ Pruebas unitarias para la generación descendente de Fibonacci.
 
-## Tecnologías Utilizadas
+✔ Pruebas de integración para los endpoints principales.
 
-- **Lenguaje**: Java
-- **Framework**: Spring Boot
-- **Gestión de Dependencias**: Maven
-- **Base de Datos**: JPA (Hibernate)
-- **Correo Electrónico**: Spring Mail
-- **Servidor Web**: Tomcat (embebido)
+## 🚀 Despliegue
 
-## Estructura del Proyecto
+La API está desplegada en Render.
 
-- `controller`: Contiene los controladores REST para manejar las solicitudes HTTP.
-- `service`: Implementa la lógica de negocio, como el cálculo de la secuencia de Fibonacci y el envío de correos electrónicos.
-- `repository`: Gestiona la interacción con la base de datos.
-- `model`: Define las entidades utilizadas en la base de datos.
+https://fibonacci-api-y490.onrender.com/resultados.html
 
-
-## Ejecución
-
-1. Clonar el repositorio.
-   git clone https://github.com/SebastianDiazJ/fibonacci-api.git
-   cd fibonacci-api
-
-2. Configurar las credenciales del servidor SMTP en el archivo `application.properties`:
-   ```properties
-   spring.mail.host=smtp.ejemplo.com
-   spring.mail.port=587
-   spring.mail.username=tu_correo@ejemplo.com
-   spring.mail.password=tu_contraseña
-   spring.mail.properties.mail.smtp.auth=true
-   spring.mail.properties.mail.smtp.starttls.enable=true
-   ```
-3. Ejecutar el proyecto con Maven:
-   ```bash
-   mvn spring-boot:run
-   ```
-4. Acceder a la API en `http://localhost:8080/api/file/upload`.
-
-## Notas
-
-- Asegúrate de que el archivo cargado tenga el formato correcto para evitar errores.
-- La API está diseñada para manejar excepciones comunes, como errores de formato en el archivo o problemas de conexión con el servidor SMTP.
-
-## Uso de la API online 
-Subir archivo de valores iniciales
-*    Ruta: POST https://fibonacci-api-y490.onrender.com/api/file/upload
-* 
-* Content-Type: multipart/form-data
-* 
-* Parámetro form-data:
-* 
-* file: Selecciona un .txt o .csv con una sola línea:
-* 
-
-a,b,cantidad,correo@dominio.com
-Ejemplo:
-
-0,1,10,usuario@gmail.com
-Respuesta JSON:
-
-"Secuencia generada, guardada y enviada correctamente."
-
-## Obtener resultados
-*    Ruta: https://fibonacci-api-y490.onrender.com/resultados.html
-
-
-## Autor
-
-Desarrollado por el equipo de **Sebastian Diaz**.
+## 👨‍💻 Autor
+Desarrollado por Sebastián Díaz
+📧 Contacto: sebasdj2006@gmail.com
+🔗 GitHub: @SebastianDiazJ

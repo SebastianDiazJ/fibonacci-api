@@ -11,7 +11,7 @@ public class FibonacciResult {
     private Long id;
 
     // Cambiados de primitivos a objetos para permitir null si es necesario
-    private Long a;
+    private Long a;//se usa clase privada para guardar el primer número de la serie
     private Long b;
     private Integer cantidad;
 

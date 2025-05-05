@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Resultados de Fibonacci</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            color: #333;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f4f4f4;
+            color: #333;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        .error {
+            color: red;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+<h1>Resultados de Fibonacci</h1>
+<table id="tabla" border="1" style="display: none;">
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Secuencia</th>
+        <th>Email</th>
+        <th>Fecha Envío</th>
+    </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+<script>
+    fetch('/api/resultados-json')
+      .then(resp => {
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        return resp.json();
+      })
+      .then(data => {
+        const table = document.getElementById('tabla');
+        table.style.display = 'table';
+
+        const tbody = document.querySelector('#tabla tbody');
+        data.forEach(item => {
+          const tr = document.createElement('tr');
+          tr.innerHTML = `
+            <td>${item.id}</td>
+            <td>${item.resultado}</td>
+            <td>${item.email}</td>
+            <td>${new Date(item.fechaEnvio).toLocaleString()}</td>
+          `;
+          tbody.appendChild(tr);
+        });
+      })
+      .catch(err => {
+        console.error('Error al cargar resultados:', err);
+        const msg = document.createElement('p');
+        msg.className = 'error';
+        msg.textContent = 'No se pudo cargar los datos: ' + err.message;
+        document.body.appendChild(msg);
+      });
+</script>
+</body>
+</html>
