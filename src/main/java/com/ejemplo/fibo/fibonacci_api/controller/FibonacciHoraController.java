@@ -53,8 +53,8 @@ public class FibonacciHoraController {
                     "\n\nGracias por usar nuestra API.";
 
             // Enviar a ambos correos
-            emailService.enviarEmail("sdiazj@proteccion.com.co", "Prueba Técnica Sebastián Diaz", mensaje);
-            emailService.enviarEmail("sebasdj2006@gmail.com", "Prueba Técnica Sebastián Diaz", mensaje);
+            emailService.enviarEmail("didier.correa@proteccion.com.co", "Prueba Técnica Sebastián Diaz", mensaje);
+            emailService.enviarEmail("correalondon@gmail.com", "Prueba Técnica Sebastián Diaz", mensaje);
 
             return ResponseEntity.ok(serie);
 
