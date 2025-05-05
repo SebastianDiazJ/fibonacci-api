@@ -2,7 +2,8 @@
 
 ## Descripción
 
-La **Fibonacci API** es una aplicación desarrollada en **Java** utilizando el framework **Spring Boot**. Su propósito principal es procesar secuencias de números de Fibonacci,
+La **Fibonacci API** es una aplicación desarrollada en **Java** utilizando el framework **Spring Boot**.
+Su propósito principal es procesar secuencias de números de Fibonacci,
 almacenarlas en una base de datos de postgrest y enviar los resultados por correo electrónico.
 La API permite a los usuarios cargar un archivo con los parámetros necesarios para generar la secuencia de Fibonacci
 y automatiza el procesamiento, almacenamiento y envío de los resultados.
@@ -21,7 +22,8 @@ y automatiza el procesamiento, almacenamiento y envío de los resultados.
      ```
 
 2. **Generación de Secuencia de Fibonacci**:
-   - A partir de los dos números iniciales y la cantidad de elementos especificados, la API genera la secuencia de Fibonacci.
+   - A partir de los dos números iniciales y la cantidad de 
+   - elementos especificados, la API genera la secuencia de Fibonacci.
 
 3. **Almacenamiento en Base de Datos**:
    - Los resultados generados se almacenan en una base de datos utilizando **Spring Data JPA**. Cada resultado incluye:
@@ -32,7 +34,8 @@ y automatiza el procesamiento, almacenamiento y envío de los resultados.
      - El correo electrónico del destinatario.
 
 4. **Envío de Resultados por Correo Electrónico**:
-   - Una vez procesada la secuencia, la API envía un correo electrónico al destinatario especificado con los resultados y la fecha de envío.
+   - Una vez procesada la secuencia, la API envía un correo 
+   - electrónico al destinatario especificado con los resultados y la fecha de envío.
 
 ## Endpoints
 
@@ -49,6 +52,40 @@ y automatiza el procesamiento, almacenamiento y envío de los resultados.
     "message": "Archivo procesado correctamente"
   }
   ```
+## Arquitectura
+             [Cliente HTTP] 
+                    ↓
+          ┌─────────────────────┐
+          │   Spring Boot App   │
+          │                     │
+          │ ┌─────────────────┐ │
+          │ │  FileUpload     │ │───📧─► SMTP Server
+          │ │  Controller     │ │
+          │ └─────────────────┘ │
+          │ ┌─────────────────┐ │
+          │ │  FibonacciService│
+          │ │  + EmailService  │
+          │ └─────────────────┘ │
+          │ ┌─────────────────┐ │
+          │ │  FibonacciResult │─► PostgreSQL
+          │ │  Repository      │
+          │ └─────────────────┘ │
+          │ ┌─────────────────┐ │
+          │ │ Static Resource │─► `/index.html`
+          │ │ (HTML + JS)     │
+          │ └─────────────────┘ │
+          └─────────────────────┘
+## Prerequisitos
+Java 17
+
+Maven
+
+Docker
+
+Cuenta en Render (para despliegue)
+
+(Opcional) Postman o cURL
+
 
 ## Tecnologías Utilizadas
 
@@ -66,15 +103,13 @@ y automatiza el procesamiento, almacenamiento y envío de los resultados.
 - `repository`: Gestiona la interacción con la base de datos.
 - `model`: Define las entidades utilizadas en la base de datos.
 
-## Requisitos Previos
-
-1. **Java 17 o superior**.
-2. **Maven** para la gestión de dependencias.
-3. Configuración de un servidor SMTP para el envío de correos electrónicos.
 
 ## Ejecución
 
 1. Clonar el repositorio.
+   git clone https://github.com/SebastianDiazJ/fibonacci-api.git
+   cd fibonacci-api
+
 2. Configurar las credenciales del servidor SMTP en el archivo `application.properties`:
    ```properties
    spring.mail.host=smtp.ejemplo.com
@@ -94,6 +129,29 @@ y automatiza el procesamiento, almacenamiento y envío de los resultados.
 
 - Asegúrate de que el archivo cargado tenga el formato correcto para evitar errores.
 - La API está diseñada para manejar excepciones comunes, como errores de formato en el archivo o problemas de conexión con el servidor SMTP.
+
+## Uso de la API online 
+Subir archivo de valores iniciales
+*    Ruta: POST https://fibonacci-api-y490.onrender.com/api/file/upload
+* 
+* Content-Type: multipart/form-data
+* 
+* Parámetro form-data:
+* 
+* file: Selecciona un .txt o .csv con una sola línea:
+* 
+
+a,b,cantidad,correo@dominio.com
+Ejemplo:
+
+0,1,10,usuario@gmail.com
+Respuesta JSON:
+
+"Secuencia generada, guardada y enviada correctamente."
+
+## Obtener resultados
+*    Ruta: https://fibonacci-api-y490.onrender.com/resultados.html
+
 
 ## Autor
 
